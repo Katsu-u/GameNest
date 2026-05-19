@@ -65,11 +65,11 @@ Pour rester faisable sur 10 jours, on ne traite pas dans la première version :
 
 ### Backend
 
-- `Java 21`
-- `Spring Boot 3`
-- `Spring Web`
-- `Spring Data JPA`
-- `Bean Validation`
+- `Node.js`
+- `Express.js`
+- `pg`
+- `express-validator`
+- `dotenv`
 
 ### Base de données
 
@@ -77,15 +77,14 @@ Pour rester faisable sur 10 jours, on ne traite pas dans la première version :
 
 ### Frontend
 
-- `Thymeleaf`
 - `HTML`
 - `CSS`
 - `JavaScript`
 
 ### Build / tests
 
-- `Maven`
-- `JUnit 5`
+- `npm`
+- `node:test`
 
 ### Conteneurisation
 
@@ -94,19 +93,19 @@ Pour rester faisable sur 10 jours, on ne traite pas dans la première version :
 
 ## 4. Pourquoi cette stack
 
-- `Spring Boot` valorise clairement la partie Java.
-- `PostgreSQL` est standard, robuste et simple à brancher à Spring.
-- `Thymeleaf` évite la complexité d'un frontend séparé et permet d'aller vite.
+- `Express.js` permet de construire un backend JavaScript léger et rapide à mettre en place.
+- `PostgreSQL` est standard, robuste et simple à brancher avec `pg`.
+- Un frontend simple en `HTML/CSS/JavaScript` évite de perdre du temps sur un framework lourd.
 - `Docker Compose` permet de démontrer une vraie orchestration application + base de données.
-- `Maven` et `JUnit` sont des choix classiques, faciles à expliquer pendant la soutenance.
+- `npm` et `node:test` sont suffisants pour un backend propre et testable.
 
 ## 5. Répartition des tâches
 
-### Membre 1 - focus Java
+### Membre 1 - focus backend JavaScript
 
 Responsabilités :
 
-- création du projet Spring Boot
+- création du projet Node.js / Express
 - modélisation des entités
 - création des repositories
 - création des services métier
@@ -144,23 +143,19 @@ GameNest/
 ├── docs/
 │   └── jour-01-cadrage.md
 ├── backend/
-│   ├── pom.xml
+│   ├── package.json
 │   ├── Dockerfile
 │   └── src/
-│       ├── main/
-│       │   ├── java/com/gamenest/
-│       │   │   ├── controller/
-│       │   │   ├── service/
-│       │   │   ├── repository/
-│       │   │   ├── model/
-│       │   │   ├── dto/
-│       │   │   └── GameNestApplication.java
-│       │   └── resources/
-│       │       ├── templates/
-│       │       ├── static/
-│       │       ├── application.properties
-│       │       └── data.sql
-│       └── test/
+│       ├── app.js
+│       ├── server.js
+│       ├── config/
+│       ├── controller/
+│       ├── service/
+│       ├── repository/
+│       ├── model/
+│       ├── routes/
+│       └── public/
+│   └── test/
 └── database/
     └── seed/
 ```
@@ -169,12 +164,12 @@ GameNest/
 
 ```mermaid
 flowchart LR
-    A["Navigateur"] --> B["Frontend Thymeleaf / HTML-CSS-JS"]
-    B --> C["Controllers Spring Boot"]
+    A["Navigateur"] --> B["Frontend HTML / CSS / JavaScript"]
+    B --> C["API Express.js"]
     C --> D["Services métier"]
-    D --> E["Repositories JPA"]
+    D --> E["Repositories"]
     E --> F["PostgreSQL"]
-    G["Docker Compose"] --> B
+    G["Docker Compose"] --> C
     G --> F
 ```
 
@@ -262,18 +257,18 @@ Pour le MVP, la similarité pourra être calculée avec un score simple basé su
 
 ## 10. Décision finale de cadrage
 
-Le projet sera un site web monolithique :
+Le projet sera un site web simple avec :
 
-- backend `Spring Boot`
-- vues serveur `Thymeleaf`
+- backend `Node.js / Express`
+- frontend `HTML / CSS / JavaScript`
 - persistance `PostgreSQL`
 - exécution via `Docker Compose`
 
 Ce choix est le plus rentable pour :
 
-- montrer une vraie architecture Java
+- montrer une vraie architecture backend JavaScript
 - garder un projet faisable en 10 jours
-- valoriser à la fois Java et Docker
+- valoriser à la fois JavaScript et Docker
 
 ## 11. Livrables de l'étape
 

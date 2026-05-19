@@ -11,9 +11,9 @@ Le cadrage du jour 1 est disponible ici :
 
 ## Stack cible
 
-- `Java 21`
-- `Spring Boot 3`
+- `Node.js`
+- `Express.js`
 - `PostgreSQL`
-- `Thymeleaf`
+- `HTML / CSS / JavaScript`
 - `Docker Compose`
  
