@@ -14,6 +14,36 @@ Le cadrage du jour 1 est disponible ici :
 - `Node.js`
 - `Express.js`
 - `PostgreSQL`
+- `IGDB API via Twitch`
 - `HTML / CSS / JavaScript`
 - `Docker Compose`
- 
+
+## Backend
+
+Depuis le dossier `backend/` :
+
+```bash
+npm install
+npm start
+```
+
+Endpoint de test :
+
+```text
+GET http://localhost:3000/api/health
+```
+
+Premiers endpoints IGDB :
+
+```text
+GET http://localhost:3000/api/games/search?q=zelda
+GET http://localhost:3000/api/games/upcoming
+GET http://localhost:3000/api/games/recent
+```
+
+Pour utiliser IGDB, renseigner les variables Twitch dans `.env` :
+
+```text
+IGDB_CLIENT_ID=...
+IGDB_CLIENT_SECRET=...
+```
