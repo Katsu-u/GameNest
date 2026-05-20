@@ -1,3 +1,5 @@
 module.exports = {
-  // Business services will be added in the next step.
+  gameService: require("./game.service"),
+  healthService: require("./health.service"),
+  igdbAuthService: require("./igdb-auth.service")
 };

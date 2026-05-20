@@ -1,4 +1,5 @@
 const igdbRepository = require("../repository/igdb.repository");
+const { gameModel } = require("../model");
 
 const DEFAULT_LIMIT = 12;
 const MAX_LIMIT = 50;
@@ -62,7 +63,7 @@ function mapStudio(involvedCompanies) {
 }
 
 function mapIgdbGame(game) {
-  return {
+  return gameModel.toGame({
     id: game.id,
     title: game.name,
     slug: game.slug,
@@ -75,7 +76,7 @@ function mapIgdbGame(game) {
     platforms: mapNames(game.platforms),
     studio: mapStudio(game.involved_companies),
     rating: game.total_rating ? Math.round(game.total_rating) : null
-  };
+  });
 }
 
 function buildSearchQuery(searchTerm, limit) {
