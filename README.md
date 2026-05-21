@@ -47,3 +47,14 @@ Pour utiliser IGDB, renseigner les variables Twitch dans `.env` :
 IGDB_CLIENT_ID=...
 IGDB_CLIENT_SECRET=...
 ```
+
+## Base de données
+
+Le schéma PostgreSQL est disponible dans `database/schema.sql`.
+
+Initialisation manuelle avec `psql` :
+
+```bash
+psql -U postgres -d gamenest -f database/schema.sql
+psql -U postgres -d gamenest -f database/seed/001_initial_data.sql
+```
