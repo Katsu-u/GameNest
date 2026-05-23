@@ -13,6 +13,36 @@ function toGame(data) {
   };
 }
 
+function slugify(value) {
+  return String(value || "")
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+function toGamePayload(data) {
+  const title = String(data.title || "").trim();
+  const slug = data.slug ? slugify(data.slug) : slugify(title);
+
+  return {
+    igdbId: data.igdbId ?? null,
+    title,
+    slug,
+    description: data.description || null,
+    releaseDate: data.releaseDate || null,
+    coverImageUrl: data.coverImageUrl || null,
+    studio: data.studio || null,
+    publisher: data.publisher || null,
+    status: data.status || "unknown",
+    rating: data.rating ?? null
+  };
+}
+
 module.exports = {
-  toGame
+  slugify,
+  toGame,
+  toGamePayload
 };

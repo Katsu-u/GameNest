@@ -1,5 +1,6 @@
 const igdbRepository = require("../repository/igdb.repository");
 const { gameModel } = require("../model");
+const { gameRepository } = require("../repository");
 
 const DEFAULT_LIMIT = 12;
 const MAX_LIMIT = 50;
@@ -79,6 +80,66 @@ function mapIgdbGame(game) {
   });
 }
 
+function handleDatabaseError(error) {
+  if (error.code === "23505") {
+    const conflict = new Error("A game with this slug or IGDB id already exists");
+    conflict.statusCode = 409;
+    throw conflict;
+  }
+
+  throw error;
+}
+
+async function listSavedGames() {
+  return gameRepository.findAll();
+}
+
+async function getSavedGameById(id) {
+  const game = await gameRepository.findById(id);
+
+  if (!game) {
+    const error = new Error("Game not found");
+    error.statusCode = 404;
+    throw error;
+  }
+
+  return game;
+}
+
+async function createSavedGame(payload) {
+  try {
+    return await gameRepository.create(gameModel.toGamePayload(payload));
+  } catch (error) {
+    return handleDatabaseError(error);
+  }
+}
+
+async function updateSavedGame(id, payload) {
+  try {
+    const game = await gameRepository.update(id, gameModel.toGamePayload(payload));
+
+    if (!game) {
+      const error = new Error("Game not found");
+      error.statusCode = 404;
+      throw error;
+    }
+
+    return game;
+  } catch (error) {
+    return handleDatabaseError(error);
+  }
+}
+
+async function deleteSavedGame(id) {
+  const deleted = await gameRepository.remove(id);
+
+  if (!deleted) {
+    const error = new Error("Game not found");
+    error.statusCode = 404;
+    throw error;
+  }
+}
+
 function buildSearchQuery(searchTerm, limit) {
   const escapedSearch = escapeSearchTerm(searchTerm);
 
@@ -133,6 +194,11 @@ async function getRecentlyReleasedGames(limit) {
 }
 
 module.exports = {
+  listSavedGames,
+  getSavedGameById,
+  createSavedGame,
+  updateSavedGame,
+  deleteSavedGame,
   searchGames,
   getUpcomingGames,
   getRecentlyReleasedGames,
