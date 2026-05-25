@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GameNest</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="hero">
+      <nav class="nav">
+        <span class="brand">GameNest</span>
+        <span class="status" id="api-status">API en verification...</span>
+      </nav>
+
+      <section class="hero-content">
+        <p class="eyebrow">Sorties, recommandations et actus gaming</p>
+        <h1>Le hub simple pour suivre les jeux passes et a venir.</h1>
+        <p class="hero-text">
+          GameNest regroupe les sorties de jeux video, les recommandations
+          similaires et les articles lies a la sphere gaming.
+        </p>
+        <div class="hero-actions">
+          <a href="#games" class="button primary">Voir les jeux</a>
+          <a href="#articles" class="button secondary">Lire les articles</a>
+        </div>
+      </section>
+    </header>
+
+    <main>
+      <section class="section" id="upcoming">
+        <div class="section-heading">
+          <p class="eyebrow">Calendrier</p>
+          <h2>Sorties a venir</h2>
+        </div>
+        <div class="grid" id="upcoming-games"></div>
+      </section>
+
+      <section class="section" id="games">
+        <div class="section-heading">
+          <p class="eyebrow">Catalogue</p>
+          <h2>Jeux repertories</h2>
+        </div>
+        <div class="grid" id="games-list"></div>
+      </section>
+
+      <section class="section similar-section" id="similar">
+        <div class="section-heading">
+          <p class="eyebrow">Recommandations</p>
+          <h2 id="similar-title">Jeux similaires</h2>
+        </div>
+        <div class="grid" id="similar-games">
+          <article class="empty-card">
+            Clique sur "Voir similaires" depuis une carte jeu.
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="articles">
+        <div class="section-heading">
+          <p class="eyebrow">Actu gaming</p>
+          <h2>Articles recents</h2>
+        </div>
+        <div class="article-list" id="articles-list"></div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <span>GameNest - Projet HUB</span>
+      <span>Backend Express + PostgreSQL + Docker</span>
+    </footer>
+
+    <script src="./app.js"></script>
+  </body>
+</html>

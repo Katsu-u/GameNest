@@ -31,6 +31,14 @@ services:
       IGDB_CLIENT_SECRET: ${IGDB_CLIENT_SECRET}
     ports:
       - "3000:3000"
-
 volumes:
   postgres_data:
+
+    frontend:
+    build:
+      context: ./frontend
+    container_name: gamenest-frontend
+    depends_on:
+      - backend
+    ports:
+      - "8080:80"
