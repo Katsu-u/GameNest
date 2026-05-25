@@ -34,7 +34,7 @@ services:
 volumes:
   postgres_data:
 
-    frontend:
+  frontend:
     build:
       context: ./frontend
     container_name: gamenest-frontend

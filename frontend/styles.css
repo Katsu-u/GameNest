@@ -247,6 +247,24 @@ h3 {
   cursor: pointer;
 }
 
+.load-more {
+  display: block;
+  width: fit-content;
+  margin: 22px auto 0;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 13px 18px;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.07);
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.load-more:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
 .article-list {
   display: grid;
   gap: 16px;

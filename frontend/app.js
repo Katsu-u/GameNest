@@ -6,7 +6,17 @@ const elements = {
   upcomingGames: document.querySelector("#upcoming-games"),
   similarGames: document.querySelector("#similar-games"),
   similarTitle: document.querySelector("#similar-title"),
-  articlesList: document.querySelector("#articles-list")
+  articlesList: document.querySelector("#articles-list"),
+  loadMoreRecent: document.querySelector("#load-more-recent"),
+  loadMoreUpcoming: document.querySelector("#load-more-upcoming")
+};
+
+const state = {
+  recentOffset: 0,
+  upcomingOffset: 0,
+  pageSize: 50,
+  recentGames: [],
+  upcomingGames: []
 };
 
 async function fetchJson(path) {
@@ -83,6 +93,46 @@ function renderUpcomingGames(games) {
     .join("");
 }
 
+async function loadRecentGames({ append = false } = {}) {
+  elements.loadMoreRecent.disabled = true;
+  elements.loadMoreRecent.textContent = "Chargement...";
+
+  const recentGames = await fetchJson(
+    `/games/recent?limit=${state.pageSize}&offset=${state.recentOffset}`
+  );
+
+  state.recentGames = append
+    ? [...state.recentGames, ...recentGames.data]
+    : recentGames.data;
+  state.recentOffset += state.pageSize;
+  renderGames(state.recentGames);
+
+  elements.loadMoreRecent.disabled = recentGames.data.length < state.pageSize;
+  elements.loadMoreRecent.textContent = elements.loadMoreRecent.disabled
+    ? "Toutes les dernieres sorties chargees"
+    : "Charger plus de dernieres sorties";
+}
+
+async function loadUpcomingGames({ append = false } = {}) {
+  elements.loadMoreUpcoming.disabled = true;
+  elements.loadMoreUpcoming.textContent = "Chargement...";
+
+  const upcomingGames = await fetchJson(
+    `/games/upcoming?limit=${state.pageSize}&offset=${state.upcomingOffset}`
+  );
+
+  state.upcomingGames = append
+    ? [...state.upcomingGames, ...upcomingGames.data]
+    : upcomingGames.data;
+  state.upcomingOffset += state.pageSize;
+  renderUpcomingGames(state.upcomingGames);
+
+  elements.loadMoreUpcoming.disabled = upcomingGames.data.length < state.pageSize;
+  elements.loadMoreUpcoming.textContent = elements.loadMoreUpcoming.disabled
+    ? "Toutes les sorties a venir chargees"
+    : "Charger plus de sorties a venir";
+}
+
 function renderSimilarGames(games) {
   if (!games.length) {
     elements.similarGames.innerHTML = `<article class="empty-card">Aucun jeu similaire trouve.</article>`;
@@ -119,7 +169,7 @@ async function loadSimilarGames(gameId, gameTitle) {
   elements.similarGames.innerHTML = `<article class="empty-card">Chargement des recommandations...</article>`;
 
   try {
-    const similarGames = await fetchJson(`/games/${gameId}/similar`);
+    const similarGames = await fetchJson(`/games/igdb/${gameId}/similar?limit=12`);
     renderSimilarGames(similarGames.data);
     document.querySelector("#similar").scrollIntoView({ behavior: "smooth" });
   } catch (error) {
@@ -144,14 +194,9 @@ async function loadHomePage() {
   elements.articlesList.innerHTML = `<article class="empty-card">Chargement des articles...</article>`;
 
   try {
-    const [games, upcomingGames, articles] = await Promise.all([
-      fetchJson("/games"),
-      fetchJson("/games/releases/upcoming"),
-      fetchJson("/articles")
-    ]);
+    const articles = await fetchJson("/articles");
 
-    renderGames(games.data);
-    renderUpcomingGames(upcomingGames.data);
+    await Promise.all([loadRecentGames(), loadUpcomingGames()]);
     renderArticles(articles.data);
   } catch (error) {
     elements.gamesList.innerHTML = `<article class="empty-card">Erreur de chargement. Verifie que Docker est lance.</article>`;
@@ -168,6 +213,14 @@ document.addEventListener("click", (event) => {
   }
 
   loadSimilarGames(button.dataset.gameId, button.dataset.gameTitle);
+});
+
+elements.loadMoreRecent.addEventListener("click", () => {
+  loadRecentGames({ append: true });
+});
+
+elements.loadMoreUpcoming.addEventListener("click", () => {
+  loadUpcomingGames({ append: true });
 });
 
 checkApiStatus();
