@@ -76,3 +76,32 @@ Initialisation manuelle avec `psql` :
 psql -U postgres -d gamenest -f database/schema.sql
 psql -U postgres -d gamenest -f database/seed/001_initial_data.sql
 ```
+```md
+## Lancement avec Docker
+
+Depuis la racine du projet :
+
+```bash
+docker compose up --build
+```
+
+Endpoints de verification :
+
+```text
+GET http://localhost:3000/api/health
+GET http://localhost:3000/api/games
+GET http://localhost:3000/api/games/releases/upcoming
+GET http://localhost:3000/api/games/1/similar
+```
+
+Pour arreter :
+
+```bash
+docker compose down
+```
+
+Pour supprimer aussi la base Docker :
+
+```bash
+docker compose down -v
+```
