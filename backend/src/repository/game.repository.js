@@ -30,6 +30,32 @@ async function findAll() {
   return result.rows.map(mapGameRow);
 }
 
+async function findUpcomingReleases(limit) {
+  const result = await baseRepository.query(
+    `SELECT * FROM games
+    WHERE release_date IS NOT NULL
+      AND release_date >= CURRENT_DATE
+    ORDER BY release_date ASC, title ASC
+    LIMIT $1`,
+    [limit]
+  );
+
+  return result.rows.map(mapGameRow);
+}
+
+async function findPastReleases(limit) {
+  const result = await baseRepository.query(
+    `SELECT * FROM games
+    WHERE release_date IS NOT NULL
+      AND release_date < CURRENT_DATE
+    ORDER BY release_date DESC, title ASC
+    LIMIT $1`,
+    [limit]
+  );
+
+  return result.rows.map(mapGameRow);
+}
+
 async function findById(id) {
   const result = await baseRepository.query("SELECT * FROM games WHERE id = $1", [id]);
 
@@ -124,6 +150,8 @@ module.exports = {
   update,
   remove,
   findAll,
+  findUpcomingReleases,
+  findPastReleases,
   findById,
   findBySlug,
   mapGameRow

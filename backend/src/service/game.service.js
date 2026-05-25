@@ -94,6 +94,14 @@ async function listSavedGames() {
   return gameRepository.findAll();
 }
 
+async function listUpcomingSavedReleases(limit) {
+  return gameRepository.findUpcomingReleases(clampLimit(limit));
+}
+
+async function listPastSavedReleases(limit) {
+  return gameRepository.findPastReleases(clampLimit(limit));
+}
+
 async function getSavedGameById(id) {
   const game = await gameRepository.findById(id);
 
@@ -195,6 +203,8 @@ async function getRecentlyReleasedGames(limit) {
 
 module.exports = {
   listSavedGames,
+  listUpcomingSavedReleases,
+  listPastSavedReleases,
   getSavedGameById,
   createSavedGame,
   updateSavedGame,

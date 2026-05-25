@@ -8,6 +8,22 @@ async function listSavedGames(req, res) {
   });
 }
 
+async function listUpcomingSavedReleases(req, res) {
+  const games = await gameService.listUpcomingSavedReleases(req.query.limit);
+
+  res.status(200).json({
+    data: games
+  });
+}
+
+async function listPastSavedReleases(req, res) {
+  const games = await gameService.listPastSavedReleases(req.query.limit);
+
+  res.status(200).json({
+    data: games
+  });
+}
+
 async function getSavedGameById(req, res) {
   const game = await gameService.getSavedGameById(req.params.id);
 
@@ -64,6 +80,8 @@ async function getRecentlyReleasedGames(req, res) {
 
 module.exports = {
   listSavedGames,
+  listUpcomingSavedReleases,
+  listPastSavedReleases,
   getSavedGameById,
   createSavedGame,
   updateSavedGame,
