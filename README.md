@@ -51,6 +51,13 @@ PUT http://localhost:3000/api/games/:id
 DELETE http://localhost:3000/api/games/:id
 ```
 
+Endpoints de sorties depuis la base locale :
+
+```text
+GET http://localhost:3000/api/games/releases/upcoming
+GET http://localhost:3000/api/games/releases/past
+```
+
 Pour utiliser IGDB, renseigner les variables Twitch dans `.env` :
 
 ```text
