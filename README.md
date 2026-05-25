@@ -37,9 +37,14 @@ Premiers endpoints IGDB :
 
 ```text
 GET http://localhost:3000/api/games/search?q=zelda
-GET http://localhost:3000/api/games/upcoming
-GET http://localhost:3000/api/games/recent
+GET http://localhost:3000/api/games/upcoming?limit=50&offset=0
+GET http://localhost:3000/api/games/recent?limit=50&offset=0
+GET http://localhost:3000/api/games/igdb/:id/similar
 ```
+
+Les listes principales de GameNest utilisent IGDB. Le paramètre `limit`
+est limité à `50` par appel et `offset` permet de charger les pages
+suivantes.
 
 Endpoints CRUD locaux :
 
@@ -59,6 +64,20 @@ GET http://localhost:3000/api/games/releases/upcoming
 GET http://localhost:3000/api/games/releases/past
 ```
 
+Ces endpoints locaux servent surtout aux jeux sauvegardés manuellement.
+Pour afficher beaucoup de sorties, utiliser les endpoints IGDB ci-dessus.
+
+Endpoints articles / actu gaming :
+
+```text
+GET http://localhost:3000/api/articles
+GET http://localhost:3000/api/articles/:id
+GET http://localhost:3000/api/articles/game/:gameId
+POST http://localhost:3000/api/articles
+PUT http://localhost:3000/api/articles/:id
+DELETE http://localhost:3000/api/articles/:id
+```
+
 Pour utiliser IGDB, renseigner les variables Twitch dans `.env` :
 
 ```text
@@ -76,7 +95,7 @@ Initialisation manuelle avec `psql` :
 psql -U postgres -d gamenest -f database/schema.sql
 psql -U postgres -d gamenest -f database/seed/001_initial_data.sql
 ```
-```md
+
 ## Lancement avec Docker
 
 Depuis la racine du projet :
@@ -89,9 +108,9 @@ Endpoints de verification :
 
 ```text
 GET http://localhost:3000/api/health
-GET http://localhost:3000/api/games
-GET http://localhost:3000/api/games/releases/upcoming
-GET http://localhost:3000/api/games/1/similar
+GET http://localhost:3000/api/games/upcoming?limit=50
+GET http://localhost:3000/api/games/recent?limit=50
+GET http://localhost:3000/api/articles
 ```
 
 Pour arreter :

@@ -96,3 +96,26 @@ test("listSimilarSavedGames returns a 404 when the target game does not exist", 
     gameRepository.findById = originalFindById;
   }
 });
+
+test("buildUpcomingQuery includes IGDB pagination", () => {
+  const query = gameService.buildUpcomingQuery("999", "50");
+
+  assert.match(query, /limit 50/);
+  assert.match(query, /offset 50/);
+  assert.match(query, /sort first_release_date asc/);
+});
+
+test("buildRecentlyReleasedQuery includes IGDB pagination", () => {
+  const query = gameService.buildRecentlyReleasedQuery("20", "100");
+
+  assert.match(query, /limit 20/);
+  assert.match(query, /offset 100/);
+  assert.match(query, /sort first_release_date desc/);
+});
+
+test("buildSimilarGameIdsQuery targets the requested IGDB game", () => {
+  assert.equal(
+    gameService.buildSimilarGameIdsQuery(1022),
+    "fields similar_games; where id = 1022; limit 1;"
+  );
+});

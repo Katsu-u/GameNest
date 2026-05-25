@@ -10,6 +10,7 @@ const router = Router();
 router.get("/search", asyncHandler(gameController.searchGames));
 router.get("/upcoming", asyncHandler(gameController.getUpcomingGames));
 router.get("/recent", asyncHandler(gameController.getRecentlyReleasedGames));
+router.get("/igdb/:id/similar", asyncHandler(gameController.getSimilarIgdbGames));
 router.get(
   "/releases/upcoming",
   asyncHandler(gameController.listUpcomingSavedReleases)

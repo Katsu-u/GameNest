@@ -4,6 +4,7 @@ const { gameRepository } = require("../repository");
 
 const DEFAULT_LIMIT = 12;
 const MAX_LIMIT = 50;
+const DEFAULT_OFFSET = 0;
 const GAME_FIELDS = [
   "id",
   "name",
@@ -25,6 +26,16 @@ function clampLimit(value) {
   }
 
   return Math.min(Math.trunc(parsed), MAX_LIMIT);
+}
+
+function clampOffset(value) {
+  const parsed = Number(value || DEFAULT_OFFSET);
+
+  if (!Number.isFinite(parsed) || parsed < 0) {
+    return DEFAULT_OFFSET;
+  }
+
+  return Math.trunc(parsed);
 }
 
 function escapeSearchTerm(value) {
@@ -171,20 +182,38 @@ function buildSearchQuery(searchTerm, limit) {
   ].join("; ") + ";";
 }
 
-function buildUpcomingQuery(limit) {
+function buildUpcomingQuery(limit, offset) {
   return [
     `fields ${GAME_FIELDS}`,
     `where first_release_date != null & first_release_date > ${unixNowSeconds()} & version_parent = null`,
     "sort first_release_date asc",
-    `limit ${clampLimit(limit)}`
+    `limit ${clampLimit(limit)}`,
+    `offset ${clampOffset(offset)}`
   ].join("; ") + ";";
 }
 
-function buildRecentlyReleasedQuery(limit) {
+function buildRecentlyReleasedQuery(limit, offset) {
   return [
     `fields ${GAME_FIELDS}`,
     `where first_release_date != null & first_release_date <= ${unixNowSeconds()} & version_parent = null`,
     "sort first_release_date desc",
+    `limit ${clampLimit(limit)}`,
+    `offset ${clampOffset(offset)}`
+  ].join("; ") + ";";
+}
+
+function buildSimilarGameIdsQuery(id) {
+  return [
+    "fields similar_games",
+    `where id = ${Number(id)}`,
+    "limit 1"
+  ].join("; ") + ";";
+}
+
+function buildGamesByIdsQuery(ids, limit) {
+  return [
+    `fields ${GAME_FIELDS}`,
+    `where id = (${ids.join(",")})`,
     `limit ${clampLimit(limit)}`
   ].join("; ") + ";";
 }
@@ -195,16 +224,71 @@ async function searchGames(searchTerm, limit) {
   return games.map(mapIgdbGame);
 }
 
-async function getUpcomingGames(limit) {
-  const games = await igdbRepository.query("games", buildUpcomingQuery(limit));
+async function getUpcomingGames(limit, offset) {
+  const safeLimit = clampLimit(limit);
+  const safeOffset = clampOffset(offset);
+  const games = await igdbRepository.query("games", buildUpcomingQuery(safeLimit, safeOffset));
 
-  return games.map(mapIgdbGame);
+  return {
+    data: games.map(mapIgdbGame),
+    meta: {
+      limit: safeLimit,
+      offset: safeOffset,
+      source: "IGDB"
+    }
+  };
 }
 
-async function getRecentlyReleasedGames(limit) {
-  const games = await igdbRepository.query("games", buildRecentlyReleasedQuery(limit));
+async function getRecentlyReleasedGames(limit, offset) {
+  const safeLimit = clampLimit(limit);
+  const safeOffset = clampOffset(offset);
+  const games = await igdbRepository.query(
+    "games",
+    buildRecentlyReleasedQuery(safeLimit, safeOffset)
+  );
 
-  return games.map(mapIgdbGame);
+  return {
+    data: games.map(mapIgdbGame),
+    meta: {
+      limit: safeLimit,
+      offset: safeOffset,
+      source: "IGDB"
+    }
+  };
+}
+
+async function getSimilarIgdbGames(id, limit) {
+  const gameId = Number(id);
+
+  if (!Number.isInteger(gameId) || gameId < 1) {
+    const error = new Error("IGDB game id must be a positive integer");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  const [game] = await igdbRepository.query("games", buildSimilarGameIdsQuery(gameId));
+  const similarIds = Array.isArray(game?.similar_games) ? game.similar_games : [];
+
+  if (!similarIds.length) {
+    return {
+      data: [],
+      meta: {
+        limit: clampLimit(limit),
+        source: "IGDB"
+      }
+    };
+  }
+
+  const selectedIds = similarIds.slice(0, clampLimit(limit));
+  const games = await igdbRepository.query("games", buildGamesByIdsQuery(selectedIds, limit));
+
+  return {
+    data: games.map(mapIgdbGame),
+    meta: {
+      limit: clampLimit(limit),
+      source: "IGDB"
+    }
+  };
 }
 
 module.exports = {
@@ -219,8 +303,13 @@ module.exports = {
   searchGames,
   getUpcomingGames,
   getRecentlyReleasedGames,
+  getSimilarIgdbGames,
   mapIgdbGame,
   buildSearchQuery,
   buildUpcomingQuery,
-  buildRecentlyReleasedQuery
+  buildRecentlyReleasedQuery,
+  buildSimilarGameIdsQuery,
+  buildGamesByIdsQuery,
+  clampLimit,
+  clampOffset
 };

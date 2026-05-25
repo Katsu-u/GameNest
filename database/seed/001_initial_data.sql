@@ -23,6 +23,12 @@ VALUES
   ('Featured')
 ON CONFLICT (name) DO NOTHING;
 
+DELETE FROM articles
+WHERE source_url LIKE 'https://example.com/%';
+
+DELETE FROM games
+WHERE slug = 'hollow-knight-silksong';
+
 INSERT INTO games (
   igdb_id,
   title,
@@ -39,7 +45,7 @@ VALUES (
   1022,
   'The Legend of Zelda',
   'the-legend-of-zelda',
-  'Classic adventure game used as seed data for GameNest.',
+  'Action-adventure game developed and published by Nintendo, first released in Japan for the Famicom Disk System.',
   '1986-02-21',
   'https://images.igdb.com/igdb/image/upload/t_cover_big/co1uii.jpg',
   'Nintendo',
@@ -66,7 +72,7 @@ VALUES
     119388,
     'The Legend of Zelda: Tears of the Kingdom',
     'the-legend-of-zelda-tears-of-the-kingdom',
-    'Open-world adventure game used to validate similar game recommendations.',
+    'Open-world action-adventure game developed and published by Nintendo for Nintendo Switch.',
     '2023-05-12',
     'https://images.igdb.com/igdb/image/upload/t_cover_big/co5vmg.jpg',
     'Nintendo',
@@ -78,7 +84,7 @@ VALUES
     1942,
     'The Witcher 3: Wild Hunt',
     'the-witcher-3-wild-hunt',
-    'Role-playing adventure game used to validate genre-based similarity.',
+    'Open-world action RPG developed and published by CD Projekt RED.',
     '2015-05-19',
     'https://images.igdb.com/igdb/image/upload/t_cover_big/co1wyy.jpg',
     'CD Projekt RED',
@@ -87,14 +93,14 @@ VALUES
     93
   ),
   (
-    133302,
-    'Hollow Knight: Silksong',
-    'hollow-knight-silksong',
-    'Upcoming indie adventure game used to validate upcoming releases.',
-    '2026-09-04',
-    'https://images.igdb.com/igdb/image/upload/t_cover_big/co2g7z.jpg',
-    'Team Cherry',
-    'Team Cherry',
+    NULL,
+    'Grand Theft Auto VI',
+    'grand-theft-auto-vi',
+    'Upcoming open-world action-adventure game developed by Rockstar Games.',
+    '2026-11-19',
+    NULL,
+    'Rockstar Games',
+    'Rockstar Games',
     'upcoming',
     NULL
   )
@@ -108,7 +114,7 @@ WHERE games.slug IN (
   'the-legend-of-zelda',
   'the-legend-of-zelda-tears-of-the-kingdom',
   'the-witcher-3-wild-hunt',
-  'hollow-knight-silksong'
+  'grand-theft-auto-vi'
 )
 ON CONFLICT DO NOTHING;
 
@@ -125,8 +131,8 @@ ON CONFLICT DO NOTHING;
 INSERT INTO game_genres (game_id, genre_id)
 SELECT games.id, genres.id
 FROM games
-JOIN genres ON genres.name = 'Indie'
-WHERE games.slug = 'hollow-knight-silksong'
+JOIN genres ON genres.name = 'Shooter'
+WHERE games.slug = 'grand-theft-auto-vi'
 ON CONFLICT DO NOTHING;
 
 INSERT INTO game_platforms (game_id, platform_id)
@@ -135,8 +141,7 @@ FROM games
 JOIN platforms ON platforms.name = 'Nintendo Switch'
 WHERE games.slug IN (
   'the-legend-of-zelda',
-  'the-legend-of-zelda-tears-of-the-kingdom',
-  'hollow-knight-silksong'
+  'the-legend-of-zelda-tears-of-the-kingdom'
 )
 ON CONFLICT DO NOTHING;
 
@@ -145,8 +150,16 @@ SELECT games.id, platforms.id
 FROM games
 JOIN platforms ON platforms.name IN ('PC (Microsoft Windows)', 'PlayStation 5', 'Xbox Series X|S')
 WHERE games.slug IN (
-  'the-witcher-3-wild-hunt',
-  'hollow-knight-silksong'
+  'the-witcher-3-wild-hunt'
+)
+ON CONFLICT DO NOTHING;
+
+INSERT INTO game_platforms (game_id, platform_id)
+SELECT games.id, platforms.id
+FROM games
+JOIN platforms ON platforms.name IN ('PlayStation 5', 'Xbox Series X|S')
+WHERE games.slug IN (
+  'grand-theft-auto-vi'
 )
 ON CONFLICT DO NOTHING;
 
@@ -155,13 +168,71 @@ INSERT INTO articles (
   summary,
   source_name,
   source_url,
-  published_at
+  published_at,
+  game_id
 )
-VALUES (
-  'GameNest seed article',
-  'Example article used to validate the articles table.',
-  'GameNest',
-  'https://example.com/gamenest-seed-article',
-  NOW()
+SELECT
+  'The Legend of Zelda on Nintendo Famicom 40th Anniversary',
+  'Official Nintendo page for the original The Legend of Zelda.',
+  'Nintendo',
+  'https://www.nintendo.com/jp/famicom/software/zelda1/index.html',
+  '2026-02-21T00:00:00Z',
+  games.id
+FROM games
+WHERE games.slug = 'the-legend-of-zelda'
+  AND NOT EXISTS (
+    SELECT 1
+    FROM articles
+    WHERE articles.source_url = 'https://www.nintendo.com/jp/famicom/software/zelda1/index.html'
+  )
+ON CONFLICT DO NOTHING;
+
+INSERT INTO articles (
+  title,
+  summary,
+  source_name,
+  source_url,
+  published_at,
+  game_id
+)
+SELECT
+  articles.title,
+  articles.summary,
+  articles.source_name,
+  articles.source_url,
+  articles.published_at::TIMESTAMPTZ,
+  games.id
+FROM (
+  VALUES
+    (
+      'Tears of the Kingdom launches for Nintendo Switch on May 12, 2023',
+      'Official Nintendo news post announcing the title and launch date of Tears of the Kingdom.',
+      'Nintendo',
+      'https://www.nintendo.com/us/whatsnew/out-of-the-shadows-the-legend-of-zelda-tears-of-the-kingdom-launches-for-nintendo-switch-on-may-12-2023/',
+      '2022-09-13T00:00:00Z',
+      'the-legend-of-zelda-tears-of-the-kingdom'
+    ),
+    (
+      'Grand Theft Auto VI is now set to launch November 19, 2026',
+      'Official Rockstar Games Newswire update confirming the new GTA VI launch date.',
+      'Rockstar Games',
+      'https://www.rockstargames.com/newswire/article/ak3ak31a49a221/grand-theft-auto-vi-is-now-set-to-launch-november-19-2026',
+      '2025-11-06T00:00:00Z',
+      'grand-theft-auto-vi'
+    ),
+    (
+      'CD PROJEKT Group summarizes the release of The Witcher 3',
+      'Official CD PROJEKT article about the launch and commercial performance of The Witcher 3.',
+      'CD PROJEKT',
+      'https://www.cdprojekt.com/en/media/news/the-cd-projekt-group-summarizes-the-release-of-the-witcher-3/',
+      '2015-08-26T00:00:00Z',
+      'the-witcher-3-wild-hunt'
+    )
+) AS articles(title, summary, source_name, source_url, published_at, game_slug)
+JOIN games ON games.slug = articles.game_slug
+WHERE NOT EXISTS (
+  SELECT 1
+  FROM articles existing_articles
+  WHERE existing_articles.source_url = articles.source_url
 )
 ON CONFLICT DO NOTHING;

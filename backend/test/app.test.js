@@ -108,3 +108,62 @@ test("POST /api/games validates status values before database access", async () 
     );
   }
 });
+
+test("POST /api/articles validates required fields before database access", async () => {
+  const server = http.createServer(app);
+
+  await new Promise((resolve) => server.listen(0, resolve));
+
+  const { port } = server.address();
+
+  try {
+    const response = await fetch(`http://127.0.0.1:${port}/api/articles`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        sourceUrl: "https://example.com/article"
+      })
+    });
+    const body = await response.json();
+
+    assert.equal(response.status, 400);
+    assert.equal(body.error, "Validation failed");
+    assert.equal(body.details[0].field, "title");
+  } finally {
+    await new Promise((resolve, reject) =>
+      server.close((error) => (error ? reject(error) : resolve()))
+    );
+  }
+});
+
+test("POST /api/articles validates source URLs before database access", async () => {
+  const server = http.createServer(app);
+
+  await new Promise((resolve) => server.listen(0, resolve));
+
+  const { port } = server.address();
+
+  try {
+    const response = await fetch(`http://127.0.0.1:${port}/api/articles`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        title: "Article test",
+        sourceUrl: "not-a-url"
+      })
+    });
+    const body = await response.json();
+
+    assert.equal(response.status, 400);
+    assert.equal(body.error, "Validation failed");
+    assert.equal(body.details[0].field, "sourceUrl");
+  } finally {
+    await new Promise((resolve, reject) =>
+      server.close((error) => (error ? reject(error) : resolve()))
+    );
+  }
+});

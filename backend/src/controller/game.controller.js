@@ -74,19 +74,27 @@ async function searchGames(req, res) {
 }
 
 async function getUpcomingGames(req, res) {
-  const games = await gameService.getUpcomingGames(req.query.limit);
+  const result = await gameService.getUpcomingGames(req.query.limit, req.query.offset);
 
-  res.status(200).json({
-    data: games
-  });
+  res.status(200).json(result);
 }
 
 async function getRecentlyReleasedGames(req, res) {
-  const games = await gameService.getRecentlyReleasedGames(req.query.limit);
+  const result = await gameService.getRecentlyReleasedGames(
+    req.query.limit,
+    req.query.offset
+  );
 
-  res.status(200).json({
-    data: games
-  });
+  res.status(200).json(result);
+}
+
+async function getSimilarIgdbGames(req, res) {
+  const result = await gameService.getSimilarIgdbGames(
+    req.params.id,
+    req.query.limit
+  );
+
+  res.status(200).json(result);
 }
 
 module.exports = {
@@ -100,5 +108,6 @@ module.exports = {
   deleteSavedGame,
   searchGames,
   getUpcomingGames,
-  getRecentlyReleasedGames
+  getRecentlyReleasedGames,
+  getSimilarIgdbGames
 };
