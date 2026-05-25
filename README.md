@@ -49,6 +49,7 @@ GET http://localhost:3000/api/games/:id
 POST http://localhost:3000/api/games
 PUT http://localhost:3000/api/games/:id
 DELETE http://localhost:3000/api/games/:id
+GET http://localhost:3000/api/games/:id/similar
 ```
 
 Endpoints de sorties depuis la base locale :

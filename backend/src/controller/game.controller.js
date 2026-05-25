@@ -32,6 +32,17 @@ async function getSavedGameById(req, res) {
   });
 }
 
+async function listSimilarSavedGames(req, res) {
+  const games = await gameService.listSimilarSavedGames(
+    req.params.id,
+    req.query.limit
+  );
+
+  res.status(200).json({
+    data: games
+  });
+}
+
 async function createSavedGame(req, res) {
   const game = await gameService.createSavedGame(req.body);
 
@@ -83,6 +94,7 @@ module.exports = {
   listUpcomingSavedReleases,
   listPastSavedReleases,
   getSavedGameById,
+  listSimilarSavedGames,
   createSavedGame,
   updateSavedGame,
   deleteSavedGame,

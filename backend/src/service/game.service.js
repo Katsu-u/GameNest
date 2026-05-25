@@ -114,6 +114,12 @@ async function getSavedGameById(id) {
   return game;
 }
 
+async function listSimilarSavedGames(id, limit) {
+  await getSavedGameById(id);
+
+  return gameRepository.findSimilarById(id, clampLimit(limit));
+}
+
 async function createSavedGame(payload) {
   try {
     return await gameRepository.create(gameModel.toGamePayload(payload));
@@ -206,6 +212,7 @@ module.exports = {
   listUpcomingSavedReleases,
   listPastSavedReleases,
   getSavedGameById,
+  listSimilarSavedGames,
   createSavedGame,
   updateSavedGame,
   deleteSavedGame,

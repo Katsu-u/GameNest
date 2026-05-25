@@ -20,6 +20,12 @@ router.get(
 );
 router.get("/", asyncHandler(gameController.listSavedGames));
 router.get(
+  "/:id/similar",
+  gameIdParam,
+  validateRequest,
+  asyncHandler(gameController.listSimilarSavedGames)
+);
+router.get(
   "/:id",
   gameIdParam,
   validateRequest,
