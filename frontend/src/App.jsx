@@ -28,7 +28,7 @@ export default function App() {
         <AdminPage />
       ) : (
         <>
-          <Header apiStatus={apiStatus} />
+          <Header />
           <main className="flex-grow">
             <GamesSection
               type="upcoming"

@@ -1,12 +1,6 @@
 import React from 'react'
-import { checkApiStatus as getApiStatus } from '../services/api'
 
 export default function Header({ apiStatus }) {
-  const getStatusClass = () => {
-    if (!apiStatus) return 'text-text-muted'
-    return apiStatus.online ? 'text-accent' : 'text-[#ff7b7b]'
-  }
-
   return (
     <header className="min-h-auto gap-16 py-6 px-[clamp(20px,5vw,72px)] flex flex-col relative overflow-hidden min-[721px]:min-h-[72vh]">
       {/* Decorative background circle replacing the hero::after style */}

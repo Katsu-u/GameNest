@@ -74,12 +74,18 @@ export default function AdminPage() {
     }
 
     try {
-      await createArticle(payload, form.adminToken)
-      sessionStorage.setItem('gamenest-admin-token', form.adminToken)
+      const adminToken = form.adminToken.trim()
+
+      if (!adminToken) {
+        throw new Error('Token admin requis')
+      }
+
+      await createArticle(payload, adminToken)
+      sessionStorage.setItem('gamenest-admin-token', adminToken)
       setHasSavedToken(true)
       setForm(currentForm => ({
         ...initialForm,
-        adminToken: currentForm.adminToken
+        adminToken
       }))
       setMessage({ type: 'success', text: 'Article ajoute avec succes.' })
       await loadArticles()
@@ -94,8 +100,17 @@ export default function AdminPage() {
     }
   }
 
-  const handleDelete = async (article) => {
-    if (!window.confirm(`Supprimer l'article "${article.title}" ?`)) {
+  const handleDelete = async (event, article) => {
+    event.preventDefault()
+    event.stopPropagation()
+
+    const adminToken = form.adminToken.trim() || sessionStorage.getItem('gamenest-admin-token') || ''
+
+    if (!adminToken) {
+      setMessage({
+        type: 'error',
+        text: "Entre le token admin avant de supprimer un article."
+      })
       return
     }
 
@@ -103,16 +118,16 @@ export default function AdminPage() {
     setMessage(null)
 
     try {
-      await deleteArticle(article.id, form.adminToken)
-      setArticles(currentArticles => (
-        currentArticles.filter(currentArticle => currentArticle.id !== article.id)
-      ))
+      await deleteArticle(article.id, adminToken)
+      sessionStorage.setItem('gamenest-admin-token', adminToken)
+      setHasSavedToken(true)
+      await loadArticles()
       setMessage({ type: 'success', text: 'Article supprime avec succes.' })
     } catch (error) {
       console.error('Error deleting article:', error)
       setMessage({
         type: 'error',
-        text: "Suppression impossible. Verifie le token admin."
+        text: `Suppression impossible : ${error.message}`
       })
     } finally {
       setDeletingArticleId(null)
@@ -264,6 +279,12 @@ export default function AdminPage() {
           <h2>Articles existants</h2>
         </div>
 
+        {message && (
+          <p className={`mb-4 ${message.type === 'success' ? 'text-accent font-bold' : 'text-red-300 font-bold'}`}>
+            {message.text}
+          </p>
+        )}
+
         {isLoadingArticles ? (
           <article className="border border-border bg-bg-surface rounded-[26px] shadow-dark p-[22px] text-text-muted text-center flex items-center justify-center min-h-[120px]">Chargement des articles...</article>
         ) : articles.length === 0 ? (
@@ -282,7 +303,7 @@ export default function AdminPage() {
                 <button
                   className="w-fit rounded-full border border-red-400/40 bg-red-500/15 py-3 px-4 text-red-200 font-black cursor-pointer transition-all duration-200 ease-in-out hover:bg-red-500/25 disabled:opacity-45 disabled:cursor-not-allowed"
                   disabled={deletingArticleId === article.id}
-                  onClick={() => handleDelete(article)}
+                  onClick={(event) => handleDelete(event, article)}
                   type="button"
                 >
                   {deletingArticleId === article.id ? 'Suppression...' : 'Supprimer'}

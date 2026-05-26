@@ -4,7 +4,8 @@ export async function fetchJson(path) {
   const response = await fetch(`${API_URL}${path}`)
   
   if (!response.ok) {
-    throw new Error(`Request failed: ${response.status}`)
+    const error = await response.json().catch(() => ({}))
+    throw new Error(error.error || `Request failed: ${response.status}`)
   }
   
   return response.json()
@@ -34,13 +35,14 @@ export async function createArticle(article, adminToken) {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "x-admin-token": adminToken
+      "x-admin-token": adminToken.trim()
     },
     body: JSON.stringify(article)
   })
 
   if (!response.ok) {
-    throw new Error(`Request failed: ${response.status}`)
+    const error = await response.json().catch(() => ({}))
+    throw new Error(error.error || `Request failed: ${response.status}`)
   }
 
   return response.json()
@@ -50,11 +52,12 @@ export async function deleteArticle(articleId, adminToken) {
   const response = await fetch(`${API_URL}/articles/${articleId}`, {
     method: "DELETE",
     headers: {
-      "x-admin-token": adminToken
+      "x-admin-token": adminToken.trim()
     }
   })
 
   if (!response.ok) {
-    throw new Error(`Request failed: ${response.status}`)
+    const error = await response.json().catch(() => ({}))
+    throw new Error(error.error || `Request failed: ${response.status}`)
   }
 }
