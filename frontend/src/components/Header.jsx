@@ -14,9 +14,6 @@ export default function Header({ apiStatus }) {
 
       <nav className="flex flex-col items-start gap-4 min-[721px]:flex-row min-[721px]:justify-between min-[721px]:items-center relative z-10">
         <span className="text-[1.35rem] font-black tracking-[0.08em] uppercase">GameNest</span>
-        <span className={`border border-border rounded-full py-2 px-3.5 bg-white/5 text-[0.9rem] ${getStatusClass()}`}>
-          {apiStatus ? `API ${apiStatus.status}` : 'API en verification...'}
-        </span>
       </nav>
 
       <section className="w-full max-w-[850px] my-auto relative z-10">
