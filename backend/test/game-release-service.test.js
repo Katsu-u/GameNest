@@ -113,9 +113,18 @@ test("buildRecentlyReleasedQuery includes IGDB pagination", () => {
   assert.match(query, /sort first_release_date desc/);
 });
 
-test("buildSimilarGameIdsQuery targets the requested IGDB game", () => {
+test("buildSimilarGameSourceQuery targets the requested IGDB game", () => {
   assert.equal(
-    gameService.buildSimilarGameIdsQuery(1022),
-    "fields similar_games; where id = 1022; limit 1;"
+    gameService.buildSimilarGameSourceQuery(1022),
+    "fields similar_games,genres,platforms; where id = 1022; limit 1;"
   );
+});
+
+test("buildFallbackSimilarGamesQuery uses genres and platforms", () => {
+  const query = gameService.buildFallbackSimilarGamesQuery(1022, [31, 12], [130], 12);
+
+  assert.match(query, /id != 1022/);
+  assert.match(query, /genres = \(31,12\)/);
+  assert.match(query, /platforms = \(130\)/);
+  assert.match(query, /sort total_rating desc/);
 });

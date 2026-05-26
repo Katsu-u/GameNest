@@ -27,6 +27,7 @@ services:
       DB_NAME: gamenest
       DB_USER: postgres
       DB_PASSWORD: postgres
+      ADMIN_TOKEN: ${ADMIN_TOKEN:-gamenest-admin}
       IGDB_CLIENT_ID: ${IGDB_CLIENT_ID}
       IGDB_CLIENT_SECRET: ${IGDB_CLIENT_SECRET}
     ports:

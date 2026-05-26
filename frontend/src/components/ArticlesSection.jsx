@@ -5,20 +5,20 @@ export default function ArticlesSection() {
   const [articles, setArticles] = useState([])
   const [isLoading, setIsLoading] = useState(true)
 
-  useEffect(() => {
-    const loadArticles = async () => {
-      setIsLoading(true)
-      try {
-        const data = await fetchArticles()
-        setArticles(data)
-      } catch (error) {
-        console.error('Error loading articles:', error)
-        setArticles([])
-      } finally {
-        setIsLoading(false)
-      }
+  const loadArticles = async () => {
+    setIsLoading(true)
+    try {
+      const data = await fetchArticles()
+      setArticles(data)
+    } catch (error) {
+      console.error('Error loading articles:', error)
+      setArticles([])
+    } finally {
+      setIsLoading(false)
     }
+  }
 
+  useEffect(() => {
     loadArticles()
   }, [])
 

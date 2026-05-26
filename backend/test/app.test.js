@@ -120,7 +120,8 @@ test("POST /api/articles validates required fields before database access", asyn
     const response = await fetch(`http://127.0.0.1:${port}/api/articles`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "x-admin-token": "gamenest-admin"
       },
       body: JSON.stringify({
         sourceUrl: "https://example.com/article"
@@ -149,7 +150,8 @@ test("POST /api/articles validates source URLs before database access", async ()
     const response = await fetch(`http://127.0.0.1:${port}/api/articles`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "x-admin-token": "gamenest-admin"
       },
       body: JSON.stringify({
         title: "Article test",
@@ -161,6 +163,35 @@ test("POST /api/articles validates source URLs before database access", async ()
     assert.equal(response.status, 400);
     assert.equal(body.error, "Validation failed");
     assert.equal(body.details[0].field, "sourceUrl");
+  } finally {
+    await new Promise((resolve, reject) =>
+      server.close((error) => (error ? reject(error) : resolve()))
+    );
+  }
+});
+
+test("POST /api/articles requires an admin token", async () => {
+  const server = http.createServer(app);
+
+  await new Promise((resolve) => server.listen(0, resolve));
+
+  const { port } = server.address();
+
+  try {
+    const response = await fetch(`http://127.0.0.1:${port}/api/articles`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        title: "Article test",
+        sourceUrl: "https://example.com/article"
+      })
+    });
+    const body = await response.json();
+
+    assert.equal(response.status, 401);
+    assert.equal(body.error, "Admin access required");
   } finally {
     await new Promise((resolve, reject) =>
       server.close((error) => (error ? reject(error) : resolve()))

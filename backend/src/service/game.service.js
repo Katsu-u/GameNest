@@ -202,18 +202,51 @@ function buildRecentlyReleasedQuery(limit, offset) {
   ].join("; ") + ";";
 }
 
-function buildSimilarGameIdsQuery(id) {
+function buildSimilarGameSourceQuery(id) {
   return [
-    "fields similar_games",
+    "fields similar_games,genres,platforms",
     `where id = ${Number(id)}`,
     "limit 1"
   ].join("; ") + ";";
+}
+
+function toIdList(values) {
+  if (!Array.isArray(values)) {
+    return [];
+  }
+
+  return values
+    .map((value) => Number(value))
+    .filter((value) => Number.isInteger(value) && value > 0);
 }
 
 function buildGamesByIdsQuery(ids, limit) {
   return [
     `fields ${GAME_FIELDS}`,
     `where id = (${ids.join(",")})`,
+    `limit ${clampLimit(limit)}`
+  ].join("; ") + ";";
+}
+
+function buildFallbackSimilarGamesQuery(id, genreIds, platformIds, limit) {
+  const filters = [];
+
+  if (genreIds.length) {
+    filters.push(`genres = (${genreIds.join(",")})`);
+  }
+
+  if (platformIds.length) {
+    filters.push(`platforms = (${platformIds.join(",")})`);
+  }
+
+  if (!filters.length) {
+    return buildRecentlyReleasedQuery(limit, 0);
+  }
+
+  return [
+    `fields ${GAME_FIELDS}`,
+    `where id != ${Number(id)} & version_parent = null & (${filters.join(" | ")})`,
+    "sort total_rating desc",
     `limit ${clampLimit(limit)}`
   ].join("; ") + ";";
 }
@@ -266,27 +299,36 @@ async function getSimilarIgdbGames(id, limit) {
     throw error;
   }
 
-  const [game] = await igdbRepository.query("games", buildSimilarGameIdsQuery(gameId));
+  const safeLimit = clampLimit(limit);
+  const [game] = await igdbRepository.query("games", buildSimilarGameSourceQuery(gameId));
   const similarIds = Array.isArray(game?.similar_games) ? game.similar_games : [];
+  let games = [];
+  let strategy = "similar_games";
 
-  if (!similarIds.length) {
-    return {
-      data: [],
-      meta: {
-        limit: clampLimit(limit),
-        source: "IGDB"
-      }
-    };
+  if (similarIds.length) {
+    const selectedIds = similarIds.slice(0, safeLimit);
+    games = await igdbRepository.query("games", buildGamesByIdsQuery(selectedIds, safeLimit));
   }
 
-  const selectedIds = similarIds.slice(0, clampLimit(limit));
-  const games = await igdbRepository.query("games", buildGamesByIdsQuery(selectedIds, limit));
+  if (!games.length) {
+    strategy = "genres_platforms_fallback";
+    games = await igdbRepository.query(
+      "games",
+      buildFallbackSimilarGamesQuery(
+        gameId,
+        toIdList(game?.genres),
+        toIdList(game?.platforms),
+        safeLimit
+      )
+    );
+  }
 
   return {
     data: games.map(mapIgdbGame),
     meta: {
-      limit: clampLimit(limit),
-      source: "IGDB"
+      limit: safeLimit,
+      source: "IGDB",
+      strategy
     }
   };
 }
@@ -308,8 +350,9 @@ module.exports = {
   buildSearchQuery,
   buildUpcomingQuery,
   buildRecentlyReleasedQuery,
-  buildSimilarGameIdsQuery,
+  buildSimilarGameSourceQuery,
   buildGamesByIdsQuery,
+  buildFallbackSimilarGamesQuery,
   clampLimit,
   clampOffset
 };

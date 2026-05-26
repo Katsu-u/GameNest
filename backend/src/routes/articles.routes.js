@@ -2,6 +2,7 @@ const { Router } = require("express");
 
 const articleController = require("../controller/article.controller");
 const asyncHandler = require("../middleware/async-handler");
+const requireAdmin = require("../middleware/require-admin");
 const validateRequest = require("../middleware/validate-request");
 const {
   articleGameIdParam,
@@ -26,12 +27,14 @@ router.get(
 );
 router.post(
   "/",
+  requireAdmin,
   articlePayloadRules,
   validateRequest,
   asyncHandler(articleController.createArticle)
 );
 router.put(
   "/:id",
+  requireAdmin,
   articleIdParam,
   articlePayloadRules,
   validateRequest,
@@ -39,6 +42,7 @@ router.put(
 );
 router.delete(
   "/:id",
+  requireAdmin,
   articleIdParam,
   validateRequest,
   asyncHandler(articleController.deleteArticle)

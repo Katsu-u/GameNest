@@ -15,7 +15,7 @@ export default function GameCard({ game, hideSimilarButton = false, onSimilarCli
   }
 
   return (
-    <article className="border border-border bg-bg-surface rounded-[26px] shadow-dark overflow-hidden flex flex-col transition-all duration-200 ease-in-out hover:-translate-y-1 hover:shadow-[0_32px_96px_rgba(0,0,0,0.48)]">
+    <article className="h-full border border-border bg-bg-surface rounded-[26px] shadow-dark overflow-hidden flex flex-col transition-all duration-200 ease-in-out hover:-translate-y-1 hover:shadow-[0_32px_96px_rgba(0,0,0,0.48)]">
       <img className="w-full aspect-[4/5] object-cover bg-bg-surface-strong" src={imageOrFallback(game)} alt={`Cover de ${game.title}`} />
       <div className="p-[18px] flex flex-col gap-2.5 flex-1">
         <div className="flex flex-wrap gap-2">

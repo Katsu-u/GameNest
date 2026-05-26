@@ -78,6 +78,12 @@ PUT http://localhost:3000/api/articles/:id
 DELETE http://localhost:3000/api/articles/:id
 ```
 
+Les routes `POST`, `PUT` et `DELETE` des articles demandent le header admin :
+
+```text
+x-admin-token: votre_token_admin
+```
+
 Pour utiliser IGDB, renseigner les variables Twitch dans `.env` :
 
 ```text
@@ -112,6 +118,14 @@ GET http://localhost:3000/api/games/upcoming?limit=50
 GET http://localhost:3000/api/games/recent?limit=50
 GET http://localhost:3000/api/articles
 ```
+
+Page admin :
+
+```text
+http://localhost:8082/admin
+```
+
+Le token de la page admin doit correspondre à `ADMIN_TOKEN` dans `.env`.
 
 Pour arreter :
 
