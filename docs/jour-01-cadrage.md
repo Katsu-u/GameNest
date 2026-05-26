@@ -97,7 +97,7 @@ Pour rester faisable sur 10 jours, on ne traite pas dans la première version :
 - `Express.js` permet de construire un backend JavaScript léger et rapide à mettre en place.
 - `PostgreSQL` est standard, robuste et simple à brancher avec `pg`.
 - `IGDB` permet de récupérer des données réelles de jeux vidéo depuis l'écosystème Twitch.
-- Un frontend simple en `HTML/CSS/JavaScript` évite de perdre du temps sur un framework lourd.
+- Un frontend simple en `React/Vite` évite de perdre du temps sur un framework lourd.
 - `Docker Compose` permet de démontrer une vraie orchestration application + base de données.
 - `npm` et `node:test` sont suffisants pour un backend propre et testable.
 
@@ -263,7 +263,7 @@ Pour le MVP, la similarité pourra être calculée avec un score simple basé su
 Le projet sera un site web simple avec :
 
 - backend `Node.js / Express`
-- frontend `HTML / CSS / JavaScript`
+- frontend `React / Vite`
 - persistance `PostgreSQL`
 - récupération de jeux via `IGDB API / Twitch`
 - exécution via `Docker Compose`

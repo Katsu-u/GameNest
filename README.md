@@ -15,7 +15,7 @@ Le cadrage du jour 1 est disponible ici :
 - `Express.js`
 - `PostgreSQL`
 - `IGDB API via Twitch`
-- `HTML / CSS / JavaScript`
+- `React` + `Vite`
 - `Docker Compose`
 
 ## Backend
