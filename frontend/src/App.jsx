@@ -5,7 +5,6 @@ import SimilarGamesSection from './components/SimilarGamesSection'
 import ArticlesSection from './components/ArticlesSection'
 import Footer from './components/Footer'
 import { checkApiStatus } from './services/api'
-import './styles/App.css'
 
 export default function App() {
   const [apiStatus, setApiStatus] = useState(null)
@@ -22,9 +21,9 @@ export default function App() {
   }
 
   return (
-    <div className="app">
+    <div className="flex flex-col min-h-screen">
       <Header apiStatus={apiStatus} />
-      <main>
+      <main className="flex-grow">
         <GamesSection 
           type="upcoming" 
           onGameSelect={handleGameSelect}
